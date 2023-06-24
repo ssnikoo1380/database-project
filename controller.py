@@ -5,6 +5,7 @@ import view
 class Login:
     usermodel = model.user()
     messagemodel = model.message()
+    is_loggedin = False
 
     def __init__(self, show_in_login):
         show_in_login.prompt("has account")
@@ -25,6 +26,7 @@ class Login:
                     show_in_login.prompt("wrong pass")
                     continue
                 break
+            self.is_loggedin = True
             show_in_login.prompt("login success")
         else:
             # sign up
@@ -40,6 +42,7 @@ class Login:
                 signup_username = input()
                 break
             if self.user_created([signup_id, signup_pass, signup_username]):
+                self.is_loggedin = True
                 show_in_login.prompt("signup success")
             else:
                 show_in_login.prompt("signup failed")
@@ -56,6 +59,23 @@ class Login:
         return True if self.usermodel.create_user(information) else False
 
 
-loginview = view.Login()
+class Chatlist:
+    def __init__(self, show_in_chatlist):
+        show_in_chatlist.prompt("")
+        selected_option = input()
+        if selected_option == "1":
+            show_in_chatlist.prompt("new")
+        elif selected_option == "2":
+            show_in_chatlist.prompt("delete")
+        elif selected_option == "3":
+            loginview = view.Login()
+            Login(loginview)
+        else:
+            show_in_chatlist.prompt("invalid option")
 
-Login(loginview)
+
+# loginview = view.Login()
+# userlogin = Login(loginview) #commented for skipping login remember to uncomment
+# if userlogin.is_loggedin:
+chatlistview = view.Chatlist()
+Chatlist(chatlistview)

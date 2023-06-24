@@ -1,9 +1,8 @@
-
-
 class Login:
-    def prompt(self, to_show: str):  # shows the needed prompts in login section
+    # shows the needed prompts in login section
+    def prompt(self, to_show: str):
         if to_show == "has account":
-            print("Do You Have An Account? Y/N \n")
+            print("Do You Have An Account? Y/N")
         elif to_show == "get id":
             print("ID: ")
         elif to_show == "no user":
@@ -22,3 +21,21 @@ class Login:
             print("Your Account Has Been Created. You Are Logged In, Enjoy!")
         elif to_show == "signup failed":
             print("Sign Up Failed!")
+
+
+class Chatlist:
+    def prompt(self, to_show: str):
+        print("Options: \n")
+        print("1.Add a New Chat")
+        print("2.Delete a Chat")
+        print("3.Logout")
+        if to_show == "new":
+            print("Enter The Name(s) Of The Person(s) You Want To Message: ")
+        elif to_show == "no user":
+            print("User Not Found!")
+        elif to_show == "delete":
+            print("Enter The Name(s) Of The Chat(s) You Want To Delete: ")
+        elif to_show == "delete success":
+            print("Selected Chat(s) Deleted Successfully!")
+        elif to_show == "invalid option":
+            print("Please Choose a Valid Option")
