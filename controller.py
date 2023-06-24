@@ -1,6 +1,4 @@
 import model
-from model import user
-from model import message
 import view
 
 
@@ -41,7 +39,10 @@ class Login:
                 show_in_login.prompt("set name")
                 signup_username = input()
                 break
-            show_in_login.prompt("signup success")
+            if self.user_created([signup_id, signup_pass, signup_username]):
+                show_in_login.prompt("signup success")
+            else:
+                show_in_login.prompt("signup failed")
 
     # checking if the entered username exists in database for login
     def user_id_exists(self, user_id: str) -> bool:
@@ -49,8 +50,10 @@ class Login:
 
     # same as username for password
     def password_is_correct(self, user_id: str, user_pass: str) -> bool:
-        print(user_pass)
         return True if self.usermodel.return_user_pass(user_id, user_pass) else False
+
+    def user_created(self, information):
+        return True if self.usermodel.create_user(information) else False
 
 
 loginview = view.Login()
