@@ -66,18 +66,42 @@ class Login:
 class Chatlist:
     def __init__(self, show_in_chatlist):
         self.show_in_chatlist = show_in_chatlist
-        show_in_chatlist.prompt("")
-        selected_option = input()
         while True:
+            show_in_chatlist.prompt("")
+            selected_option = input()
             if selected_option == "1":
-                self.make_chat()
-                break  # to be replaced by something that takes user to chatroom
+                if not self.make_chat():
+                    self.show_in_chatlist.prompt("ask make new")
+                    self.show_in_chatlist.prompt("ask menu")
+                    selected_option = input()
+                    if selected_option == "1":
+                        self.make_chat()
+                    else:
+                        continue
+                else:
+                    break
             elif selected_option == "2":
                 self.delete_chat()
-                break
             elif selected_option == "3":
-                self.chatlist()
-
+                chatlist = self.chatlist()
+                if chatlist:
+                    show_in_chatlist.setchatlist(chatlist)
+                    while True:
+                        show_in_chatlist.prompt("choose chat")
+                        show_in_chatlist.prompt("chatlist")
+                        to_chat = input()
+                        if to_chat in chatlist:
+                            break  # a code that take the user to chat with selected user
+                        else:
+                            show_in_chatlist.prompt("no user")
+                else:
+                    show_in_chatlist.prompt("empty chatlist")
+                    makechat = input()
+                    if makechat.lower() == "y":
+                        self.make_chat()
+                    else:
+                        continue
+                break
             elif selected_option == "4":
                 loginview = view.Login()
                 Login(loginview)
@@ -99,12 +123,12 @@ class Chatlist:
             receiver_name = input()
             if not usermodel.return_user_id(receiver_name):
                 self.show_in_chatlist.prompt("no user")
-                self.show_in_chatlist.prompt("ask make new")
-                self.show_in_chatlist.prompt("ask menu")
+                return False
+            elif not self.send_message(receiver_name, ""):
+                self.show_in_chatlist.prompt("not sent")
+                return False
             else:
-                if not self.send_message(receiver_name, ""):
-                    self.show_in_chatlist.prompt("not sent")
-                break
+                return True
 
     def delete_chat(self):
         while True:
@@ -127,12 +151,12 @@ class Chatlist:
         for name in receiver_names:
             if name[0] not in chatlist:
                 chatlist.append(name[0])
-        sorted_chatlist = chatlist.sort()
-        return sorted_chatlist
+        chatlist.sort()
+        return chatlist
 
 
 class Chatscreen:
-    def __init__(self):
+    def __init__(self, sender, receiver):
         print("chat room")
 
 
