@@ -26,7 +26,10 @@ class Login:
 class Chatlist:
     chatlist = []
 
-    def prompt(self, to_show: str):
+    def setchatlist(self, to_show_chatlist):
+        self.chatlist = to_show_chatlist
+
+    def prompt(self, to_show):
         if to_show == "":
             print("Options: \n")
             print("1.Add a New Chat")
@@ -49,8 +52,13 @@ class Chatlist:
             print("Selected Chat(s) Deleted Successfully!")
         elif to_show == "delete fail":
             print("Unable To Delete!")
-        elif to_show == "current":
-            for chat in self.chatlist:
-                print(chat, "\n")
+        elif to_show == "chatlist":
+            for chatnum, chat in enumerate(self.chatlist):
+                print(f"{chatnum + 1}.{chat}")
+        elif to_show == "choose chat":
+            print("Who Do You Want To Chat With?")
+        elif to_show == "empty chatlist":
+            print("You Don't Have Any Chats!")
+            print("Wanna Make One? Y/N")
         elif to_show == "invalid option":
             print("Please Choose a Valid Option")
