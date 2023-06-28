@@ -1,4 +1,6 @@
 import mysql.connector
+import random
+import string
 
 
 class User:
@@ -108,3 +110,14 @@ mydb = mysql.connector.connect(
     database="chat_app"
 )
 mycursor = mydb.cursor()
+for x in range(100):
+    randint1 = random.choice(range(10))
+    randint2 = random.choice(range(10))
+    randlst = random.choices(string.ascii_letters, k=random.choice(range(256)))
+    randstr = ""
+    for char in randlst:
+        randstr = randstr + char
+    query = "INSERT INTO messages (text, receiver_id, is_read, FKuser_id) VALUES (%s, %s, %s, %s)"
+    values = (randstr, "ssn" + str(randint1), False, "ssn" + str(randint2))
+    mycursor.execute(query, values)
+    mydb.commit()
