@@ -25,17 +25,25 @@ class Login:
 
 class Chatlist:
     chatlist = []
+    message_list = []
 
     def setchatlist(self, to_show_chatlist):
         self.chatlist = to_show_chatlist
 
     def prompt(self, to_show):
-        if to_show == "":
+        if to_show == 0:
             print("Options: \n")
             print("1.Add a New Chat")
             print("2.Delete a Chat")
             print("3.Show Current Chats")
             print("4.Logout")
+        elif to_show == 1:
+            print("Options: \n")
+            print("1.Add a New Chat")
+            print("2.Delete a Chat")
+            print("3.Show Current Chats")
+            print("4.Message List")
+            print("5.Logout")
         if to_show == "new":
             print("Enter The Name(s) Of The Person(s) You Want To Message: ")
         elif to_show == "no user":
@@ -56,10 +64,13 @@ class Chatlist:
             for chatnum, chat in enumerate(self.chatlist):
                 print(f"{chatnum + 1}.{chat}")
         elif to_show == "choose chat":
-            print("Who Do You Want To Chat With?")
+            print("Who Do You Want To Chat With? (Can Be Multiple People)")
         elif to_show == "empty chatlist":
             print("You Don't Have Any Chats!")
             print("Wanna Make One? Y/N")
+        elif to_show == "message list":
+            print(
+                f"Message ID = {self.message_list[0]} Sender = {self.message_list[1]} Receiver = {self.message_list[2]} Text = {self.message_list[3]} Seen Status = {self.message_list[4]} SendDate = {self.message_list[5]}")
         elif to_show == "invalid option":
             print("Please Choose a Valid Option")
 
