@@ -100,17 +100,19 @@ class Chatlist:
                             break  # a code that take the user to chat with selected user
                         else:
                             show_in_chatlist.prompt("no user")
-                        break
+                        continue
                 else:
                     show_in_chatlist.prompt("empty chatlist")
                     makechat = input()
                     if makechat.lower() == "y":
-                        self.make_chat()
+                        self.to_chat = self.make_chat()
+                        break
                     else:
                         continue
                 break
             elif selected_option == "4":
                 self.create_message_list(messagemodel.message_list())
+                break
             elif selected_option == "5":
                 loginview = view.Login()
                 Login(loginview)
@@ -158,8 +160,8 @@ class Chatlist:
         receiver_names = messagemodel.return_chatlist(userlogin.login_id)
         chatlist = []
         for name in receiver_names:
-            if name[0] not in chatlist:
-                chatlist.append(name[0])
+            if name not in chatlist:
+                chatlist.append(name)
         chatlist.sort()
         return chatlist
 
