@@ -36,7 +36,7 @@ class Chatlist:
             print("1.Add a New Chat")
             print("2.Delete a Chat")
             print("3.Show Current Chats")
-            print("4.Logout")
+            print("5.Logout")
         elif to_show == 1:
             print("Options: \n")
             print("1.Add a New Chat")
