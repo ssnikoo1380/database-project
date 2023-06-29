@@ -69,7 +69,10 @@ class Chatlist:
     def __init__(self, show_in_chatlist):
         self.show_in_chatlist = show_in_chatlist
         while True:
-            show_in_chatlist.prompt("")
+            if not usermodel.is_admin(userlogin.return_user_id()):
+                show_in_chatlist.prompt(0)
+            else:
+                show_in_chatlist.prompt(1)
             selected_option = input()
             if selected_option == "1":
                 self.to_chat = self.make_chat()
@@ -106,6 +109,8 @@ class Chatlist:
                         continue
                 break
             elif selected_option == "4":
+                self.create_message_list(messagemodel.message_list())
+            elif selected_option == "5":
                 loginview = view.Login()
                 Login(loginview)
                 break
@@ -123,15 +128,15 @@ class Chatlist:
     def make_chat(self):
         while True:
             self.show_in_chatlist.prompt("new")
-            receiver_name = input()
-            if not usermodel.return_user_id(receiver_name):
+            receiver_names = input()
+            if not usermodel.return_user_id(receiver_names):
                 self.show_in_chatlist.prompt("no user")
                 return False
-            elif not self.send_message(receiver_name, ""):
+            elif not self.send_message(receiver_names, ""):
                 self.show_in_chatlist.prompt("not sent")
                 return False
             else:
-                return receiver_name
+                return receiver_names
 
     def delete_chat(self):
         while True:
@@ -157,10 +162,22 @@ class Chatlist:
         chatlist.sort()
         return chatlist
 
+    def create_message_list(self, messagelist):
+        for message in messagelist:
+            msg_id = message[0]
+            sender = message[5]
+            receiver = message[2]
+            senddate = message[4]
+            seen_status = True if message[3] else False
+            text = message[1]
+            chatlistview.message_list = [
+                msg_id, sender, receiver, text, seen_status, senddate]
+            self.show_in_chatlist.prompt("message list")
+
 
 class Chatroom:
     def __init__(self, show_in_chat, to_chat):
-        my_id = userlogin.login_id
+        my_id = userlogin.return_user_id()
         chat = messagemodel.return_chat(my_id, to_chat)
         if chat:
             for message in chat:
@@ -178,9 +195,10 @@ class Chatroom:
                 messagemodel.send_message(my_id, to_chat, mymessage)
         else:
             show_in_chat.prompt("chat empty")
-            show_in_chat.prompt("get message")
-            mymessage = input()
-            messagemodel.send_message(my_id, to_chat, mymessage)
+            while True:
+                show_in_chat.prompt("get message")
+                mymessage = input()
+                messagemodel.send_message(my_id, to_chat, mymessage)
 
 
 loginview = view.Login()
