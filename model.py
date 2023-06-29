@@ -1,6 +1,8 @@
 import mysql.connector
 import random
 import string
+import datetime
+import time
 
 
 class User:
@@ -55,8 +57,9 @@ class Message:
 
     def send_message(self, sender, receiver, message):
         try:
-            msgcrt_query = "INSERT INTO messages (text, receiver_id, is_read, FKuser_id) VALUES (%s, %s, %s, %s)"
-            msgcrt_values = (message, receiver, False, sender)
+            msgcrt_query = "INSERT INTO messages (text, receiver_id, is_read, date, FKuser_id) VALUES (%s, %s, %s, %s, %s)"
+            msgcrt_values = (message, receiver, False,
+                             datetime.datetime.now(), sender)
             self.messagecursor.execute(msgcrt_query, msgcrt_values)
             self.mydb.commit()
         except Exception:
@@ -85,12 +88,31 @@ class Message:
         self.messagecursor.execute(query, values)
         return self.messagecursor.fetchall()
 
+    def return_chat(self, sender, receiver):
+        query = "SELECT text, FKuser_id FROM messages WHERE (FKuser_id = %s or receiver_id = %s) and (receiver_id = %s or FKuser_id = %s) ORDER BY date"
+        values = (sender, sender, receiver, receiver)
+        self.messagecursor.execute(query, values)
+        return self.messagecursor.fetchall()
+
+    def seen(self, sender, receiver):
+        try:
+            query = "UPDATE messages SET is_read = %s WHERE is_read = %s and receiver_id = %s and FKuser_id = %s"
+            # setting receiver_id equal to my id so that
+            # the is_read field of every message from the person that im chatting with becomes true
+            values = (1, 0, sender, receiver)
+            self.messagecursor.execute(query, values)
+            mydb.commit()
+        except Exception:
+            return False
+        return True
+
     def create_table(self):
         self.messagecursor.execute("""CREATE TABLE messages(
                 msg_id INT AUTO_INCREMENT NOT NULL,
                 text TEXT,
                 receiver_id VARCHAR(255) NOT NULL,
                 is_read BIT,
+                date DATETIME,
                 FKuser_id VARCHAR(255) NOT NULL,
                 PRIMARY KEY (msg_id),
                 FOREIGN KEY (FKuser_id) REFERENCES users(user_id)
@@ -110,14 +132,12 @@ mydb = mysql.connector.connect(
     database="chat_app"
 )
 mycursor = mydb.cursor()
-for x in range(100):
-    randint1 = random.choice(range(10))
-    randint2 = random.choice(range(10))
-    randlst = random.choices(string.ascii_letters, k=random.choice(range(256)))
-    randstr = ""
-    for char in randlst:
-        randstr = randstr + char
-    query = "INSERT INTO messages (text, receiver_id, is_read, FKuser_id) VALUES (%s, %s, %s, %s)"
-    values = (randstr, "ssn" + str(randint1), False, "ssn" + str(randint2))
-    mycursor.execute(query, values)
-    mydb.commit()
+# message = Message()
+# for x in range(1000000):
+#     randint1 = random.choice([x for x in range(10)] + ["", ])
+#     randint2 = random.choice([x for x in range(10)] + ["", ])
+#     randlst = random.choices(string.ascii_letters, k=random.choice(range(256)))
+#     randstr = ""
+#     for char in randlst:
+#         randstr = randstr + char
+#     message.send_message("ssn" + str(randint2), "ssn" + str(randint1), randstr)

@@ -62,3 +62,18 @@ class Chatlist:
             print("Wanna Make One? Y/N")
         elif to_show == "invalid option":
             print("Please Choose a Valid Option")
+
+
+class Chatroom:
+    message = None
+    receiver = None
+
+    def prompt(self, to_show):
+        if to_show == "chat empty":
+            print("No Messages! Say Something: ")
+        elif to_show == "my messages":
+            print(f"You: {self.message}")
+        elif to_show == "their messages":
+            print(f"    {self.receiver}: {self.message}")
+        elif to_show == "get message":
+            print("You:")

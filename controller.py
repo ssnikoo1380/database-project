@@ -64,13 +64,16 @@ class Login:
 
 
 class Chatlist:
+    to_chat = None
+
     def __init__(self, show_in_chatlist):
         self.show_in_chatlist = show_in_chatlist
         while True:
             show_in_chatlist.prompt("")
             selected_option = input()
             if selected_option == "1":
-                if not self.make_chat():
+                self.to_chat = self.make_chat()
+                if not self.to_chat:
                     self.show_in_chatlist.prompt("ask make new")
                     self.show_in_chatlist.prompt("ask menu")
                     selected_option = input()
@@ -89,8 +92,8 @@ class Chatlist:
                     while True:
                         show_in_chatlist.prompt("choose chat")
                         show_in_chatlist.prompt("chatlist")
-                        to_chat = input()
-                        if to_chat in chatlist:
+                        self.to_chat = input()
+                        if self.to_chat in chatlist:
                             break  # a code that take the user to chat with selected user
                         else:
                             show_in_chatlist.prompt("no user")
@@ -128,7 +131,7 @@ class Chatlist:
                 self.show_in_chatlist.prompt("not sent")
                 return False
             else:
-                return True
+                return receiver_name
 
     def delete_chat(self):
         while True:
@@ -155,16 +158,39 @@ class Chatlist:
         return chatlist
 
 
-class Chatscreen:
-    def __init__(self, sender, receiver):
-        print("chat room")
+class Chatroom:
+    def __init__(self, show_in_chat, to_chat):
+        my_id = userlogin.login_id
+        chat = messagemodel.return_chat(my_id, to_chat)
+        if chat:
+            for message in chat:
+                if message[1] == my_id:
+                    show_in_chat.message = message[0]
+                    show_in_chat.prompt("my messages")
+                else:
+                    show_in_chat.message = message[0]
+                    show_in_chat.receiver = to_chat
+                    show_in_chat.prompt("their messages")
+            messagemodel.seen(my_id, to_chat)
+            while True:
+                show_in_chat.prompt("get message")
+                mymessage = input()
+                messagemodel.send_message(my_id, to_chat, mymessage)
+        else:
+            show_in_chat.prompt("chat empty")
+            show_in_chat.prompt("get message")
+            mymessage = input()
+            messagemodel.send_message(my_id, to_chat, mymessage)
 
 
 loginview = view.Login()
 messagemodel = model.Message()
 usermodel = model.User()
-# commented for skipping login remember to uncomment
 userlogin = Login(loginview)
 if userlogin.is_loggedin:
     chatlistview = view.Chatlist()
     chatlist = Chatlist(chatlistview)
+    to_chat = chatlist.to_chat
+    if to_chat:
+        chatroomview = view.Chatroom()
+        chatroom = Chatroom(chatroomview, to_chat)
