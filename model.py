@@ -31,7 +31,9 @@ class User:
         for input_user_id in input_user_ids:
             input_user_id = (input_user_id, )
             self.usercursor.execute(user_id_query, input_user_id)
-            user_ids.append(self.usercursor.fetchall())
+            query_reult = self.usercursor.fetchall()
+            if query_reult:
+                user_ids.append(query_reult)
         return user_ids
 
     def return_user_pass(self, input_user_id):
@@ -95,10 +97,13 @@ class Message:
         return True
 
     def return_chatlist(self, sender):
-        query = "SELECT receiver_id FROM messages WHERE FKuser_id = %s "
-        values = (sender, )
+        query = "SELECT receiver_id, FKuser_id FROM messages WHERE FKuser_id = %s or receiver_id = %s"
+        values = (sender, sender)
         self.messagecursor.execute(query, values)
-        return self.messagecursor.fetchall()
+        chatlist = []
+        for chat in self.messagecursor.fetchall():
+            chatlist.append(chat[0] if chat[0] != sender else chat[1])
+        return chatlist
 
     def return_chat(self, sender, receiver):
         query = "SELECT text, FKuser_id FROM messages WHERE (FKuser_id = %s or receiver_id = %s) and (receiver_id = %s or FKuser_id = %s) ORDER BY date"
