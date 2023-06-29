@@ -66,16 +66,17 @@ class Message:
     messagecursor = mydb.cursor()
 
     def send_message(self, sender, receivers, message):
-        try:
-            msgcrt_query = "INSERT INTO messages (text, receiver_id, is_read, date, FKuser_id) VALUES (%s, %s, %s, %s, %s)"
-            receivers = receivers.split()
-            msgcrt_values = [(message, receiver, False,
-                              datetime.datetime.now(), sender) for receiver in receivers]
-            self.messagecursor.executemany(msgcrt_query, msgcrt_values)
-            self.mydb.commit()
-        except Exception:
-            return False
-        return True
+        if message:
+            try:
+                msgcrt_query = "INSERT INTO messages (text, receiver_id, is_read, date, FKuser_id) VALUES (%s, %s, %s, %s, %s)"
+                receivers = receivers.split()
+                msgcrt_values = [(message, receiver, False,
+                                  datetime.datetime.now(), sender) for receiver in receivers]
+                self.messagecursor.executemany(msgcrt_query, msgcrt_values)
+                self.mydb.commit()
+            except Exception:
+                return False
+            return True
 
     def chat_exists(self, receiver, sender):
         query = "SELECT * FROM messages WHERE receiver_id = %s and FKuser_id = %s"

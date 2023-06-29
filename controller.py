@@ -100,6 +100,7 @@ class Chatlist:
                             break  # a code that take the user to chat with selected user
                         else:
                             show_in_chatlist.prompt("no user")
+                        break
                 else:
                     show_in_chatlist.prompt("empty chatlist")
                     makechat = input()
