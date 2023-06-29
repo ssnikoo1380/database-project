@@ -24,11 +24,15 @@ class User:
                                             )"""
                                 )
 
-    def return_user_id(self, input_user_id):
+    def return_user_id(self, input_user_ids):
         user_id_query = """SELECT user_id FROM users WHERE user_id = %s"""
-        input_user_id = (input_user_id, )
-        self.usercursor.execute(user_id_query, input_user_id)
-        return self.usercursor.fetchall()
+        input_user_ids = input_user_ids.split()
+        user_ids = []
+        for input_user_id in input_user_ids:
+            input_user_id = (input_user_id, )
+            self.usercursor.execute(user_id_query, input_user_id)
+            user_ids.append(self.usercursor.fetchall())
+        return user_ids
 
     def return_user_pass(self, input_user_id):
         user_pass_query = """SELECT password FROM users WHERE user_id = %s"""
@@ -45,6 +49,12 @@ class User:
             return False
         return True
 
+    def is_admin(self, user_id):
+        query = "SELECT user_id FROM users WHERE user_id = %s and %s IN (SELECT user_id FROM users WHERE is_admin = %s)"
+        values = (user_id, user_id, 1)
+        self.usercursor.execute(query, values)
+        return True if self.usercursor.fetchall() else False
+
 
 class Message:
     mydb = mysql.connector.connect(
@@ -55,12 +65,13 @@ class Message:
     )
     messagecursor = mydb.cursor()
 
-    def send_message(self, sender, receiver, message):
+    def send_message(self, sender, receivers, message):
         try:
             msgcrt_query = "INSERT INTO messages (text, receiver_id, is_read, date, FKuser_id) VALUES (%s, %s, %s, %s, %s)"
-            msgcrt_values = (message, receiver, False,
-                             datetime.datetime.now(), sender)
-            self.messagecursor.execute(msgcrt_query, msgcrt_values)
+            receivers = receivers.split()
+            msgcrt_values = [(message, receiver, False,
+                              datetime.datetime.now(), sender) for receiver in receivers]
+            self.messagecursor.executemany(msgcrt_query, msgcrt_values)
             self.mydb.commit()
         except Exception:
             return False
@@ -106,6 +117,10 @@ class Message:
             return False
         return True
 
+    def message_list(self):
+        self.messagecursor.execute("SELECT * FROM messages")
+        return self.messagecursor.fetchall()
+
     def create_table(self):
         self.messagecursor.execute("""CREATE TABLE messages(
                 msg_id INT AUTO_INCREMENT NOT NULL,
@@ -132,7 +147,8 @@ mydb = mysql.connector.connect(
     database="chat_app"
 )
 mycursor = mydb.cursor()
-# message = Message()
+message = Message()
+message.send_message("ssn", ("ssn9", "ssn8", "ssn7"), "hello")
 # for x in range(1000000):
 #     randint1 = random.choice([x for x in range(10)] + ["", ])
 #     randint2 = random.choice([x for x in range(10)] + ["", ])
